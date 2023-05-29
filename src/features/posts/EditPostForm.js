@@ -12,19 +12,30 @@ export const EditPostForm = ({ match }) => {
 
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
+  const [userId, setUserId] = useState('')
 
   const dispatch = useDispatch()
   const history = useHistory()
+  const users = useSelector((state) => state.users)
 
   const onTitleChanged = (e) => setTitle(e.target.value)
   const onContentChanged = (e) => setContent(e.targer.value)
+  const onAuthorChanged = (e) => setUserId(e.target.value)
 
   const onSavePostClicked = () => {
     if (title && content) {
-      dispatch(postUpdated({ id: postId, title, content }))
+      dispatch(postUpdated({ id: postId, title, content, userId }))
       history.push(`/posts/${postId}`)
     }
   }
+
+  const canSave = Boolean(title) && Boolean(content) && Boolean(userId)
+
+  const usersOptions = users.map((user) => (
+    <option key={user.id} value={user.id}>
+      {user.name}
+    </option>
+  ))
 
   return (
     <section>
@@ -39,6 +50,11 @@ export const EditPostForm = ({ match }) => {
           value={title}
           onChange={onTitleChanged}
         />
+        <label htmlFor="postAuthor">Author:</label>
+        <select id="postAuthor" value={userId} onChange={onAuthorChanged}>
+          <option value=""></option>
+          {usersOptions}
+        </select>
         <label htmlFor="postContent">Content:</label>
         <textarea
           id="postContent"
@@ -47,7 +63,7 @@ export const EditPostForm = ({ match }) => {
           onChange={onContentChanged}
         />
       </form>
-      <button type="button" onClick={onSavePostClicked}>
+      <button type="button" onClick={onSavePostClicked} disabled={!canSave}>
         Save Post
       </button>
     </section>
