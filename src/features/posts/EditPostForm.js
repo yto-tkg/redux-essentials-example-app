@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
 import { postUpdated, selectPostById } from './postsSlice'
+import { selectAllUsers } from '../users/userSlice'
 
 export const EditPostForm = ({ match }) => {
   const { postId } = match.params
@@ -14,7 +15,7 @@ export const EditPostForm = ({ match }) => {
 
   const dispatch = useDispatch()
   const history = useHistory()
-  const users = useSelector((state) => state.users)
+  const users = useSelector(selectAllUsers)
 
   const onTitleChanged = (e) => setTitle(e.target.value)
   const onContentChanged = (e) => setContent(e.targer.value)
