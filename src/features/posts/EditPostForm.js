@@ -3,11 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
 import { postUpdated, selectPostById } from './postsSlice'
 import { selectAllUsers } from '../users/userSlice'
+import { useGetPostQuery, useEditPostMutation } from '../api/apiSlice'
 
 export const EditPostForm = ({ match }) => {
   const { postId } = match.params
 
-  const post = useSelector((state) => selectPostById(state, postId))
+  //   const post = useSelector((state) => selectPostById(state, postId))
+  const { data: post } = useGetPostQuery(postId)
+  const [updatePost, { isLoading }] = useEditPostMutation()
 
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
@@ -21,9 +24,10 @@ export const EditPostForm = ({ match }) => {
   const onContentChanged = (e) => setContent(e.targer.value)
   const onAuthorChanged = (e) => setUserId(e.target.value)
 
-  const onSavePostClicked = () => {
+  const onSavePostClicked = async () => {
     if (title && content) {
-      dispatch(postUpdated({ id: postId, title, content, userId }))
+      //   dispatch(postUpdated({ id: postId, title, content, userId }))
+      await updatePost({ id: postId, title, content, userId })
       history.push(`/posts/${postId}`)
     }
   }
