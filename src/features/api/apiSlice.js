@@ -20,8 +20,19 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Posts'],
     }),
+    editPost: builder.mutation({
+      query: (post) => ({
+        url: `posts/${post.id}`,
+        method: 'PATCH',
+        body: post,
+      }),
+    }),
   }),
 })
 
-export const { useGePostsQuery, useGetPostQuery, useAddNewPostMutation } =
-  apiSlice
+export const {
+  useGePostsQuery,
+  useGetPostQuery,
+  useAddNewPostMutation,
+  useEditPostMutation,
+} = apiSlice
