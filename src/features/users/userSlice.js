@@ -6,9 +6,10 @@ import {
 } from '@reduxjs/toolkit'
 import { client } from '../../api/client'
 import { apiSlice } from '../api/apiSlice'
+import { response } from 'msw'
 
-// const usersAdapter = createEntityAdapter()
-// const initialState = usersAdapter.getInitialState()
+const usersAdapter = createEntityAdapter()
+const initialState = usersAdapter.getInitialState()
 
 // export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
 //   const response = await client.get('/fakeApi/users')
@@ -19,6 +20,9 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query({
       query: () => '/users',
+      transformResponse: (responseData) => {
+        return usersAdapter.setAll(initialState, responseData)
+      },
     }),
   }),
 })
@@ -26,18 +30,22 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
 export const { useGetUsersQuery } = extendedApiSlice
 
 export const selectUsersResult = extendedApiSlice.endpoints.getUsers.select()
-const emptyUsers = []
-
-export const selectAllUsers = createSelector(
+const selectUsersData = createSelector(
   selectUsersResult,
-  (usersResult) => usersResult?.data ?? emptyUsers
+  (usersResult) => usersResult.data
 )
+// const emptyUsers = []
 
-export const selectUserById = createSelector(
-  selectAllUsers,
-  (state, userId) => userId,
-  (users, userId) => users.find((user) => user.id === userId)
-)
+// export const selectAllUsers = createSelector(
+//   selectUsersResult,
+//   (usersResult) => usersResult?.data ?? emptyUsers
+// )
+
+// export const selectUserById = createSelector(
+//   selectAllUsers,
+//   (state, userId) => userId,
+//   (users, userId) => users.find((user) => user.id === userId)
+// )
 
 // const usersSlice = createSlice({
 //   name: 'users',
@@ -52,5 +60,6 @@ export const selectUserById = createSelector(
 // export const selectAllUsers = (state) => state.users
 // export const selectUserById = (state, userId) =>
 //   state.users.find((user) => user.id === userId)
-// export const { selectAll: selectAllUsers, selectById: selectUserById } =
-//   usersAdapter.getSelectors((state) => state.users)
+
+export const { selectAll: selectAllUsers, selectById: selectUserById } =
+  usersAdapter.getSelectors((state) => selectUsersData(state) ?? initialState)
